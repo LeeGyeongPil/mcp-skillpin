@@ -132,3 +132,46 @@ def test_add_yes_reinstall_without_local_edits_unchanged(project: Project) -> No
     assert project.run("add", "demo", "release-notes", "--target", "claude", "--yes").code == 0
     again = project.run("add", "demo", "release-notes", "--target", "claude", "--yes")
     assert again.code == 0 and "edited locally" not in again.out
+
+
+# -- server unchanged, installed copy edited locally ----------------------------------
+def _edit_release_notes(project: Project) -> "tuple[object, bytes]":
+    folder = project.cwd / ".claude" / "skills" / "release-notes"
+    original = (folder / "SKILL.md").read_bytes()
+    (folder / "SKILL.md").write_bytes(original + b"local note\n")
+    return folder, original
+
+
+def test_update_unchanged_server_local_edit_without_yes_writes_nothing(project: Project) -> None:
+    install_v1(project)
+    folder, _orig = _edit_release_notes(project)
+    edited = (folder / "SKILL.md").read_bytes()
+    before_lock = project.lock_path.read_bytes()
+    res = project.run("update", "release-notes")
+    assert res.code == 0
+    assert "SKILL.md" in res.out and "edited locally" in res.out
+    assert (folder / "SKILL.md").read_bytes() == edited
+    assert project.lock_path.read_bytes() == before_lock
+
+
+def test_update_unchanged_server_local_edit_yes_stops(project: Project) -> None:
+    install_v1(project)
+    folder, _orig = _edit_release_notes(project)
+    edited = (folder / "SKILL.md").read_bytes()
+    before_lock = project.lock_path.read_bytes()
+    res = project.run("update", "release-notes", "--yes")
+    assert res.code == 2
+    assert "error[local-edits]" in res.err + res.out
+    assert (folder / "SKILL.md").read_bytes() == edited
+    assert project.lock_path.read_bytes() == before_lock
+
+
+def test_update_unchanged_server_discard_local_restores_pinned_copy(project: Project) -> None:
+    install_v1(project)
+    folder, original = _edit_release_notes(project)
+    before_lock = project.lock_path.read_bytes()
+    res = project.run("update", "release-notes", "--yes", "--discard-local")
+    assert res.code == 0
+    assert (folder / "SKILL.md").read_bytes() == original
+    assert project.lock_path.read_bytes() == before_lock
+    assert project.run("verify").code == 0

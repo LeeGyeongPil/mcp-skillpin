@@ -49,6 +49,7 @@
   "update.no_old": "note: the installed copy of {path} no longer matches the lock, so no diff is shown for it",
   "update.dry_run": "Dry run: nothing was changed. Review the diff and risks above, then re-run with --yes to approve.",
   "update.applied": "Updated '{name}' and re-pinned it in {lock}",
+  "update.restored": "Restored '{name}' to its pinned copy; the lock file is unchanged",
   "verify.ok": "{name} ok",
   "verify.bad": "{name} MODIFIED",
   "verify.modified": "modified: {files}",

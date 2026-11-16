@@ -346,13 +346,45 @@ def cmd_update(
                     result.append({"skill": name, "status": "missing"})
                     continue
                 if set_digest(entry.resources) == rec["setDigest"]:
-                    ctx.say(t("check.unchanged", name=name))
-                    result.append({"skill": name, "status": "unchanged"})
+                    # Server unchanged: only a locally edited copy needs any work.
+                    dest = lockfile.load_path(rec["target"], ctx.lock_path.parent, ctx.home)
+                    local_edits: list[str] = []
+                    if dest.is_dir():
+                        edited, _gone, extra = install.verify_installed(dest, _locked_files(rec))
+                        local_edits = edited + extra
+                    if not local_edits:
+                        ctx.say(t("check.unchanged", name=name))
+                        result.append({"skill": name, "status": "unchanged"})
+                        continue
+                    result.append(_restore_pinned(ctx, cfg, client, entry, rec, dest, local_edits, yes, discard_local))
                     continue
                 bundle = fetch_bundle(client, entry)
                 result.append(_review_and_apply(ctx, cfg, lock, key, rec, bundle, yes, grants, discard_local))
     ctx.results.append(result)
     return EXIT_OK
+
+
+def _restore_pinned(
+    ctx: Context, cfg: config.ServerConfig, client: SkillsClient, entry: Entry, rec: dict[str, Any],
+    dest: Path, local_edits: list[str], yes: bool, discard_local: bool,
+) -> dict[str, Any]:
+    """Server unchanged but the installed copy was edited: re-write the pinned copy on request."""
+    name = dest.name
+    ctx.say(t("update.header", name=name, server=cfg.label))
+    ctx.say(t("update.local_edits", files=", ".join(local_edits)))
+    out = {"skill": name, "status": "unchanged", "applied": False, "localEdits": local_edits}
+    if not yes:
+        ctx.say(t("update.dry_run"))
+        return out
+    if not discard_local:
+        raise SkillpinError("local-edits", name=name, files=", ".join(local_edits))
+    bundle = fetch_bundle(client, entry)
+    if set_digest(bundle.entry.resources) != rec["setDigest"]:
+        raise SkillpinError("protocol-error", detail="the server changed while restoring; run update again")
+    install.install(bundle, dest.parent, cfg.label)  # the lock file already pins exactly these bytes
+    ctx.say(t("update.restored", name=name))
+    out["applied"] = True
+    return out
 
 
 def _review_and_apply(

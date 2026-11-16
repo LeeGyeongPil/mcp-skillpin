@@ -49,6 +49,7 @@
   "update.no_old": "참고: 설치된 {path} 가 잠금과 달라 이 파일의 diff 는 보여 주지 않습니다",
   "update.dry_run": "dry-run: 아무것도 바꾸지 않았습니다. 위 diff 와 위험 신호를 읽고, 승인하려면 --yes 를 붙여 다시 실행하세요.",
   "update.applied": "'{name}' 을(를) 갱신하고 {lock} 에 다시 고정했습니다",
+  "update.restored": "'{name}' 을(를) 고정된 사본으로 복원했습니다. 잠금 파일은 그대로입니다",
   "verify.ok": "{name} 정상",
   "verify.bad": "{name} 수정됨",
   "verify.modified": "수정: {files}",
