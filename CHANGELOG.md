@@ -3,6 +3,11 @@
 All notable changes to this project are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.1.2] - 2026-11-16
+
+### Fixed
+- `update` now handles a locally edited skill when the server has not changed: `--yes` stops with `error[local-edits]` (exit 2) and `--yes --discard-local` rewrites the pinned copy, as the README describes. Before, it only printed `unchanged`.
+
 ## [0.1.1] - 2026-11-16
 
 ### Fixed
