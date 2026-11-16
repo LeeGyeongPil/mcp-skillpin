@@ -105,3 +105,30 @@ def test_update_warns_and_refuses_to_discard_local_edits(project: Project) -> No
     ok = project.run("update", "release-notes", "--yes", "--discard-local")
     assert ok.code == 0, ok.text
     assert "my note" not in skill_md.read_text()
+
+
+def test_add_yes_refuses_to_overwrite_local_edits(project: Project) -> None:
+    import json
+
+    assert project.run("add", "demo", "release-notes", "--target", "claude", "--yes").code == 0
+    skill_md = project.cwd / ".claude" / "skills" / "release-notes" / "SKILL.md"
+    skill_md.write_text(skill_md.read_text() + "my note\n")
+    lock_before = project.lock_path.read_bytes()
+    dry = project.run("add", "demo", "release-notes", "--target", "claude", "--json")
+    assert dry.code == 0 and json.loads(dry.out)["localEdits"] == ["SKILL.md"]
+    plain = project.run("add", "demo", "release-notes", "--target", "claude")
+    assert plain.code == 0 and "edited locally" in plain.out and "SKILL.md" in plain.out
+    res = project.run("add", "demo", "release-notes", "--target", "claude", "--yes")
+    assert res.code == 2 and "error[local-edits]" in res.err
+    assert "my note" in skill_md.read_text()
+    assert project.lock_path.read_bytes() == lock_before
+    ok = project.run("add", "demo", "release-notes", "--target", "claude", "--yes", "--discard-local")
+    assert ok.code == 0, ok.text
+    assert "my note" not in skill_md.read_text()
+    assert project.run("verify").code == 0
+
+
+def test_add_yes_reinstall_without_local_edits_unchanged(project: Project) -> None:
+    assert project.run("add", "demo", "release-notes", "--target", "claude", "--yes").code == 0
+    again = project.run("add", "demo", "release-notes", "--target", "claude", "--yes")
+    assert again.code == 0 and "edited locally" not in again.out

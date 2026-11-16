@@ -208,7 +208,10 @@ def cmd_list(ctx: Context, server: str) -> int:
 
 
 # -- add -------------------------------------------------------------------
-def cmd_add(ctx: Context, server: str, skill: str, target: str, yes: bool, grants: set[str]) -> int:
+def cmd_add(
+    ctx: Context, server: str, skill: str, target: str, yes: bool, grants: set[str],
+    discard_local: bool = False,
+) -> int:
     cfg = config.find_server(servers_of(ctx), server)
     with open_client(ctx, cfg) as client:
         entry = parse_entry(_resolve_entry(client, skill, cfg.label))
@@ -221,6 +224,10 @@ def cmd_add(ctx: Context, server: str, skill: str, target: str, yes: bool, grant
     dest = root / bundle.name
     known = lockfile.load_path(old["target"], ctx.lock_path.parent, ctx.home) if old else None
     install.check_collision(dest, known)
+    local_edits: list[str] = []
+    if old and dest.is_dir():
+        edited, _gone, extra = install.verify_installed(dest, _locked_files(old))
+        local_edits = edited + extra
     missing, record = _pending_grants(bundle.frontmatter, (old or {}).get("grants", {}), grants)
     risks = diff.content_risks(bundle.files, None, None, bundle.frontmatter)
 
@@ -231,10 +238,12 @@ def cmd_add(ctx: Context, server: str, skill: str, target: str, yes: bool, grant
         ctx.say(_risk_line(risk))
     for key_name in missing:
         ctx.say(t("add.grant_needed", key=key_name))
+    if local_edits:
+        ctx.say(t("update.local_edits", files=", ".join(local_edits)))
     result: dict[str, Any] = {
         "skill": bundle.name, "server": cfg.label, "dest": str(dest), "installed": False,
         "files": sorted(bundle.files), "risks": [{"code": r.code, "path": r.path} for r in risks],
-        "grantsNeeded": missing,
+        "grantsNeeded": missing, "localEdits": local_edits,
     }
     if not yes:
         ctx.say(t("add.dry_run"))
@@ -242,6 +251,9 @@ def cmd_add(ctx: Context, server: str, skill: str, target: str, yes: bool, grant
         return EXIT_OK
     if missing:
         raise SkillpinError("grant-required", keys=", ".join(missing), name=bundle.name)
+    if local_edits and not discard_local:
+        # Nothing has been written yet: the folder and the lock file stay as they are.
+        raise SkillpinError("local-edits", name=bundle.name, files=", ".join(local_edits))
     install.install(bundle, root, cfg.label)
     lock["skills"][key] = _lock_record(ctx, cfg, bundle, dest, record)
     lockfile.save(ctx.lock_path, lock)

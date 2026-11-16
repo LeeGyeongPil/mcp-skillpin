@@ -95,7 +95,7 @@ def test_install_replaces_atomically_and_removes_old_files(project: Project) -> 
     project.run("add", "demo", "release-notes", "--target", "claude", "--yes")
     folder = project.cwd / ".claude" / "skills" / "release-notes"
     (folder / "stray.txt").write_text("x")
-    assert project.run("add", "demo", "release-notes", "--target", "claude", "--yes").code == 0
+    assert project.run("add", "demo", "release-notes", "--target", "claude", "--yes", "--discard-local").code == 0
     assert not (folder / "stray.txt").exists()
     assert os.listdir(folder.parent) == ["release-notes"]
 

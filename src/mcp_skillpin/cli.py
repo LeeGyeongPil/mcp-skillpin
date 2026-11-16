@@ -128,6 +128,7 @@ def build_parser(out: TextIO | None = None, err: TextIO | None = None) -> argpar
     p.add_argument("--target", required=True, metavar="T", help=t("help.target"))
     p.add_argument("--yes", action="store_true", help=t("help.yes"))
     p.add_argument("--grant", action="append", choices=GRANT_KEYS, default=[], help=t("help.grant"))
+    p.add_argument("--discard-local", action="store_true", help=t("help.discard_local"))
     p = add("check", "help.check")
     p.add_argument("names", nargs="*", metavar="name", help=t("help.names"))
     p = add("update", "help.update")
@@ -185,7 +186,7 @@ def main(
         elif ns.command == "list":
             code = cmd_list(ctx, ns.server)
         elif ns.command == "add":
-            code = cmd_add(ctx, ns.server, ns.skill, ns.target, ns.yes, set(ns.grant))
+            code = cmd_add(ctx, ns.server, ns.skill, ns.target, ns.yes, set(ns.grant), ns.discard_local)
         elif ns.command == "check":
             code = cmd_check(ctx, ns.names)
         elif ns.command == "update":
