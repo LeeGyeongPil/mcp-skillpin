@@ -199,7 +199,7 @@ uv sync --locked
 uv run pytest
 ```
 
-144 tests, using only local mock servers (and a FastMCP server for an interoperability check): no keys, no network beyond installing dependencies. Bugs and ideas are welcome as issues. Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+147 tests, using only local mock servers (and a FastMCP server for an interoperability check): no keys, no network beyond installing dependencies. Bugs and ideas are welcome as issues. Changes are listed in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 

@@ -199,7 +199,7 @@ uv sync --locked
 uv run pytest
 ```
 
-테스트 144개는 로컬 목 서버(상호운용 확인용 FastMCP 서버 포함)만 쓰며 키도, 의존성 설치 외 네트워크도 필요 없습니다. 버그·제안은 이슈로 남겨 주세요. 변경 기록은 [CHANGELOG.md](CHANGELOG.md).
+테스트 147개는 로컬 목 서버(상호운용 확인용 FastMCP 서버 포함)만 쓰며 키도, 의존성 설치 외 네트워크도 필요 없습니다. 버그·제안은 이슈로 남겨 주세요. 변경 기록은 [CHANGELOG.md](CHANGELOG.md).
 
 ## 라이선스
 
