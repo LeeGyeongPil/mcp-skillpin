@@ -57,7 +57,7 @@ Run it from the project folder where your `.mcp.json` (Claude Code) or `.codex/c
 | `verify` | Re-hashes the installed folders and compares them with the lock file | `mcp-skillpin verify` |
 | `demo` | Whole flow against the practice mock server in a temporary folder | `mcp-skillpin demo` |
 
-`update --yes` refuses to overwrite local edits in an installed folder (`error[local-edits]`, exit 2); add `--discard-local` to overwrite them on purpose. `add` of a skill that is already pinned in another target stops with `error[target-changed]` (exit 2). Mistakes on the command line print `error[usage]` (exit 2) in your language, and a local disk that refuses a read or write prints `error[io-error]` (exit 2).
+`add --yes` and `update --yes` refuse to overwrite local edits in an installed folder (`error[local-edits]`, exit 2); add `--discard-local` to overwrite them on purpose. `add` of a skill that is already pinned in another target stops with `error[target-changed]` (exit 2). Mistakes on the command line print `error[usage]` (exit 2) in your language, and a local disk that refuses a read or write prints `error[io-error]` (exit 2).
 
 Common options: `--lang en|ko`, `--lock PATH` (default `./mcp-skills.lock.json`), `--json` (machine-readable output), `--timeout SECONDS` (default 30). `--version` prints the version.
 
@@ -181,7 +181,7 @@ This is explicit per-skill approval, not a cache: the default is a dry run, inst
 | `error[digest-mismatch]` / `size-mismatch` | The server's files do not match what it listed | Nothing was written. Do not install; report it to the server's owner |
 | `error[grant-required]` (exit 4) | The skill widens permissions | Read the skill, then add `--grant allowed-tools` or `--grant hooks` |
 | `error[local-collision]` | The target folder exists and is not pinned by the lock file | Move it away or choose another `--target`; existing files are left untouched |
-| `error[local-edits]` | You edited the installed copy and ran `update --yes` | Save your edits elsewhere, then add `--discard-local` |
+| `error[local-edits]` | You edited the installed copy and ran `add --yes` or `update --yes` | Save your edits elsewhere, then add `--discard-local` |
 | `error[target-changed]` | The skill is already pinned in another target folder | Remove that folder first, or keep the same `--target` |
 | `error[unsafe-path]` | The server listed an unsafe path, two paths that differ only by letter case or Unicode form (`SKILL.md` and `skill.md`), a file that is also a folder (`docs` and `docs/x.md`), two spellings of one folder (`ref/` and `REF/`), or the reserved name `.mcp-origin.json` | Nothing was written, and the message names the colliding paths. Ask the server's owner to rename one of them |
 | `error[usage]` | A missing or unknown argument or command | Run the command shown in the hint (`--help`) |
@@ -199,7 +199,7 @@ uv sync --locked
 uv run pytest
 ```
 
-142 tests, using only local mock servers (and a FastMCP server for an interoperability check): no keys, no network beyond installing dependencies. Bugs and ideas are welcome as issues. Changes are listed in [CHANGELOG.md](CHANGELOG.md).
+144 tests, using only local mock servers (and a FastMCP server for an interoperability check): no keys, no network beyond installing dependencies. Bugs and ideas are welcome as issues. Changes are listed in [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 

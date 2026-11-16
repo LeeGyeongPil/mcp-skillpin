@@ -57,7 +57,7 @@ mcp-skillpin demo
 | `verify` | 설치된 폴더를 다시 해시해 잠금 파일과 비교 | `mcp-skillpin verify` |
 | `demo` | 임시 폴더에서 연습용 목 서버로 전체 흐름 실행 | `mcp-skillpin demo` |
 
-`update --yes` 는 설치 폴더의 로컬 수정을 덮어쓰지 않습니다(`error[local-edits]`, 종료 코드 2). 일부러 덮어쓰려면 `--discard-local` 을 더하세요. 이미 다른 대상에 고정된 스킬을 `add` 하면 `error[target-changed]`(종료 코드 2)로 멈춥니다. 명령줄 실수는 고른 언어로 `error[usage]`(종료 코드 2)를 출력하고, 로컬 디스크가 읽기·쓰기를 거부하면 `error[io-error]`(종료 코드 2)를 출력합니다.
+`add --yes` 와 `update --yes` 는 설치 폴더의 로컬 수정을 덮어쓰지 않습니다(`error[local-edits]`, 종료 코드 2). 일부러 덮어쓰려면 `--discard-local` 을 더하세요. 이미 다른 대상에 고정된 스킬을 `add` 하면 `error[target-changed]`(종료 코드 2)로 멈춥니다. 명령줄 실수는 고른 언어로 `error[usage]`(종료 코드 2)를 출력하고, 로컬 디스크가 읽기·쓰기를 거부하면 `error[io-error]`(종료 코드 2)를 출력합니다.
 
 공통 옵션: `--lang en|ko`, `--lock PATH`(기본 `./mcp-skills.lock.json`), `--json`(기계가 읽는 출력), `--timeout SECONDS`(기본 30). `--version` 은 버전을 보여 줍니다.
 
@@ -181,7 +181,7 @@ flowchart LR
 | `error[digest-mismatch]` / `size-mismatch` | 서버의 파일이 목록과 다름 | 아무것도 쓰지 않았습니다. 설치하지 말고 서버 운영자에게 알리세요 |
 | `error[grant-required]` (종료 코드 4) | 스킬이 권한을 넓힘 | 스킬을 읽은 뒤 `--grant allowed-tools` 또는 `--grant hooks` 를 붙이세요 |
 | `error[local-collision]` | 대상 폴더가 있고 잠금 파일이 관리하지 않음 | 폴더를 치우거나 다른 `--target` 을 쓰세요. 기존 파일은 건드리지 않았습니다 |
-| `error[local-edits]` | 설치된 사본을 고친 뒤 `update --yes` 실행 | 수정본을 다른 곳에 저장하고 `--discard-local` 을 더하세요 |
+| `error[local-edits]` | 설치된 사본을 고친 뒤 `add --yes` 또는 `update --yes` 실행 | 수정본을 다른 곳에 저장하고 `--discard-local` 을 더하세요 |
 | `error[target-changed]` | 스킬이 이미 다른 대상 폴더에 고정돼 있음 | 그 폴더를 먼저 지우거나 같은 `--target` 을 쓰세요 |
 | `error[unsafe-path]` | 서버가 안전하지 않은 경로, 대소문자·유니코드 형태만 다른 두 경로(`SKILL.md` 와 `skill.md`), 파일이면서 폴더인 경로(`docs` 와 `docs/x.md`), 철자가 둘인 폴더(`ref/` 와 `REF/`), 예약 이름 `.mcp-origin.json` 을 나열함 | 아무것도 쓰지 않았고, 메시지가 충돌한 경로를 알려 줍니다. 서버 운영자에게 하나의 이름을 바꿔 달라고 요청하세요 |
 | `error[usage]` | 인자나 명령이 빠졌거나 알 수 없음 | 힌트에 나온 `--help` 를 실행하세요 |
@@ -199,7 +199,7 @@ uv sync --locked
 uv run pytest
 ```
 
-테스트 142개는 로컬 목 서버(상호운용 확인용 FastMCP 서버 포함)만 쓰며 키도, 의존성 설치 외 네트워크도 필요 없습니다. 버그·제안은 이슈로 남겨 주세요. 변경 기록은 [CHANGELOG.md](CHANGELOG.md).
+테스트 144개는 로컬 목 서버(상호운용 확인용 FastMCP 서버 포함)만 쓰며 키도, 의존성 설치 외 네트워크도 필요 없습니다. 버그·제안은 이슈로 남겨 주세요. 변경 기록은 [CHANGELOG.md](CHANGELOG.md).
 
 ## 라이선스
 
