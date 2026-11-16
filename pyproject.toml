@@ -1,0 +1,38 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-skillpin"
+version = "0.1.0"
+description = "Verify, pin and install agent skills served by MCP servers (Skills Extension, SEP-2640) into Claude Code and Codex skill folders."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.11"
+keywords = ["mcp", "agent-skills", "claude-code", "codex", "sep-2640", "lockfile"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Topic :: Software Development",
+]
+dependencies = ["pyyaml==6.0.3"]
+
+[project.urls]
+Homepage = "https://github.com/LeeGyeongPil/mcp-skillpin"
+Issues = "https://github.com/LeeGyeongPil/mcp-skillpin/issues"
+
+[project.scripts]
+mcp-skillpin = "mcp_skillpin.cli:main_entry"
+
+[dependency-groups]
+dev = ["pytest==9.2.0", "fastmcp==4.2.0"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcp_skillpin"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
